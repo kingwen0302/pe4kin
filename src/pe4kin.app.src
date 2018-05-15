@@ -6,8 +6,8 @@
   {applications,
    [kernel,
     stdlib,
-    hackney,
-    cowboy
+    hackney
+    %%,cowboy
    ]},
   {env,[]},
   {modules, []},
