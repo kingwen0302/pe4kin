@@ -196,22 +196,26 @@ api_call({ApiServerEndpoint, Token}, _Bot, Method, Payload) ->
 
 
 do_api_call(Url, undefined) ->
-    hackney:request(<<"GET">>, Url, [], [], [{pool, ?HACKNEY_POOL}]);
+    HackneyOpts = application:get_env(pe4kin, hackney_request_opts, []),
+    hackney:request(<<"GET">>, Url, [], [], [{pool, ?HACKNEY_POOL}] ++ HackneyOpts);
 do_api_call(Url, {json, Payload}) ->
     Json = jsx:encode(Payload),
     Headers = [{<<"Content-Type">>, <<"application/json">>},
                {<<"Accept">>, <<"application/json">>}],
-    hackney:request(<<"POST">>, Url, Headers, Json, [{pool, ?HACKNEY_POOL}]);
+    HackneyOpts = application:get_env(pe4kin, hackney_request_opts, []),
+    hackney:request(<<"POST">>, Url, Headers, Json, [{pool, ?HACKNEY_POOL}] ++ HackneyOpts);
 do_api_call(Url, {query, Payload}) ->
     Headers = [{<<"Content-Type">>, <<"application/x-www-form-urlencoded; encoding=utf-8">>},
                {<<"Accept">>, <<"application/json">>}],
+    HackneyOpts = application:get_env(pe4kin, hackney_request_opts, []),
     hackney:request(<<"POST">>, Url, Headers, {form, maps:to_list(Payload)},
-                    [{pool, ?HACKNEY_POOL}]);
+                    [{pool, ?HACKNEY_POOL}] ++ HackneyOpts);
 do_api_call(Url, {multipart, Payload}) ->
     Headers = [{<<"Content-Type">>, <<"multipart/form-data">>},
                {<<"Accept">>, <<"application/json">>}],
+    HackneyOpts = application:get_env(pe4kin, hackney_request_opts, []),
     hackney:request(<<"POST">>, Url, Headers, {multipart, Payload},
-                    [{pool, ?HACKNEY_POOL}]).
+                    [{pool, ?HACKNEY_POOL}] ++ HackneyOpts).
 
 body_with_file(FileFields, Payload) ->
     body_with_file_(FileFields, json, Payload).

@@ -177,8 +177,9 @@ do_start_http_poll(Opts, #state{token=Token, active=false} = State) ->
                          || {Key, Val} <- maps:to_list(Opts1)]),
     Endpoint = application:get_env(pe4kin, api_server_endpoint, <<"https://api.telegram.org">>),
     Url = <<Endpoint/binary, "/bot", Token/binary, "/getUpdates?", QS/binary>>,
+    HackneyOpts = application:get_env(pe4kin, hackney_request_opts, []),
     case hackney:request(<<"GET">>, Url, [], <<>>,
-                         [async, {recv_timeout, (Timeout + 5) * 1000}]) of
+                         [async, {recv_timeout, (Timeout + 5) * 1000}] ++ HackneyOpts) of
         {ok, Ref} ->
             State#state{%% method = longpoll,
               active = true,
